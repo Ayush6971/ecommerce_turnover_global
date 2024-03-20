@@ -7,5 +7,6 @@ router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 router.get('/signUp', authController.getSignUpPage);
 router.post('/signUp', authController.signUp);
+router.post('verify', authController.verify)
 
 module.exports = router;

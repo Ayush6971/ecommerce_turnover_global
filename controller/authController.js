@@ -1,6 +1,7 @@
 const passport = require('passport');
-const { hashPassword } = require('./commonController');
+const { hashPassword, generateOTP, renderTemplate } = require('./commonController');
 const User = require('../models/user');
+const { sendEmail } = require('../utils/email')
 require('dotenv').config({})
 
 const getLoginPage = async (req, res) => {
@@ -63,26 +64,64 @@ const signUp = async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Create new user
         const newUser = await User.create({
             username,
             email,
             password: hashPassword(password),
         });
 
-        return res.status(201).json({ message: 'User created successfully' });
+        const otp = generateOTP()
 
+        const authEmail = __dirname + '/../views/emails/authEmail.ejs'
+
+        const mailOptions = {
+            to: email,
+            subject: 'Welcome to Ecommerce!',
+            html: await renderTemplate(authEmail, { otp })
+        }
+
+        await sendEmail(mailOptions)
+
+        User.update({ otp }, { where: { id: newUser.id } })
+        return res.render('verifyOtp', { email: newUser.email })
     } catch (err) {
         console.log("🚀 ~ login ~ err:", err)
         throw new Error(err)
     }
 };
 
+const verify = async (req, res) => {
+    try {
+        const { otp, email } = req.body;
+        if (!otp || !email) {
+            return res.status(401).json({ message: 'All fields are mandatory' })
+        }
+
+        const findUser = await User.findOne({ where: { email } });
+        if (!findUser) {
+            return res.status(400).json({
+                message: 'Email not found'
+            });
+        }
+        if (Number(otp) !== Number(findUser.otp)) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        await User.update({ isAuthenticated: true }, { id: findUser.id });
+
+        return res.status(200).json({ message: 'Email verified successfully' });
+
+    } catch (err) {
+        console.log("🚀 ~ login ~ err:", err)
+        throw new Error(err)
+    }
+}
 
 module.exports = {
     getLoginPage,
     login,
     logout,
     getSignUpPage,
-    signUp
+    signUp,
+    verify
 }

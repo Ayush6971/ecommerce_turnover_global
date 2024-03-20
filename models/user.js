@@ -21,6 +21,10 @@ const user = sequelize.define('user', {
     otp: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    isAuthenticated: {
+        type: DataTypes.BOOLEAN,
+        default: false
     }
 }, {
     tableName: 'users'

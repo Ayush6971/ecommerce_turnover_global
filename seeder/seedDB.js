@@ -9,6 +9,7 @@ async function seedData() {
             username: 'System User',
             email: 'admin@example.com',
             password: hashPassword('testPassword'),
+            isAuthenticated: true
         })
     }
 
