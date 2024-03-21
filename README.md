@@ -6,7 +6,7 @@ This project is a simple e-commerce website designed to provide users with an in
 
 ### Features
 
-User Signup and Login: Users can sign up for an account and log in to access the website's features.
+User Signup and Login: Users can sign up for an account and log in to access the website's features.<br>
 Category Selection: Users can view a list of product categories and mark the ones they're interested in.
 Pagination: The category list is paginated, allowing users to navigate through categories easily.
 Persistent Selection: User-selected categories are stored in the database, allowing users to see their selections even after logging out and logging back in.
