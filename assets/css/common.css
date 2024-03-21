@@ -1,4 +1,5 @@
 .login-box,
-.signup-box {
-    width: 360px;
+.signup-box,
+.verifyOtp-box {
+    width: 400px;
 }

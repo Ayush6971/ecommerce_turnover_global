@@ -1,4 +1,5 @@
 const passport = require('passport');
+const { sequelize, Sequelize } = require('../models/');
 const { hashPassword, generateOTP, renderTemplate } = require('./commonController');
 const User = require('../models/user');
 const { sendEmail } = require('../utils/email')
@@ -52,6 +53,7 @@ const getSignUpPage = async (req, res) => {
 }
 
 const signUp = async (req, res) => {
+    const t = await sequelize.transaction()
     try {
         const { username, email, password } = req.body;
 
@@ -59,7 +61,7 @@ const signUp = async (req, res) => {
             return res.status(401).json({ message: 'All fields are mandatory' })
         }
 
-        const existingUser = await User.findOne({ where: { email } });
+        const existingUser = await User.findOne({ where: { email }, transaction: t });
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists' });
         }
@@ -68,7 +70,8 @@ const signUp = async (req, res) => {
             username,
             email,
             password: hashPassword(password),
-        });
+        },
+            { transaction: t });
 
         const otp = generateOTP()
 
@@ -83,21 +86,40 @@ const signUp = async (req, res) => {
         await sendEmail(mailOptions)
 
         User.update({ otp }, { where: { id: newUser.id } })
-        return res.render('verifyOtp', { email: newUser.email })
+        await t.commit()
+        return res.status(200).json({ message: "User Created Succesfully", id: newUser.id })
     } catch (err) {
         console.log("🚀 ~ login ~ err:", err)
+        await t.rollback()
         throw new Error(err)
     }
 };
 
+const getVerifyOtpPage = async (req, res) => {
+    try {
+        const userId = req?.params?.id
+        const findUser = await User.findOne({ where: { id: userId } })
+        if (!findUser) {
+            return res.status(400).json({
+                message: 'User not found'
+            });
+        }
+        return res.render('verifyOtp', { email: findUser.email });
+    } catch (err) {
+        console.log("🚀 ~ login ~ err:", err)
+        throw new Error(err)
+    }
+}
+
 const verify = async (req, res) => {
+    const t = await sequelize.transaction()
     try {
         const { otp, email } = req.body;
         if (!otp || !email) {
             return res.status(401).json({ message: 'All fields are mandatory' })
         }
 
-        const findUser = await User.findOne({ where: { email } });
+        const findUser = await User.findOne({ where: { email }, transaction: t });
         if (!findUser) {
             return res.status(400).json({
                 message: 'Email not found'
@@ -107,12 +129,14 @@ const verify = async (req, res) => {
             return res.status(400).json({ message: 'Invalid OTP' });
         }
 
-        await User.update({ isAuthenticated: true }, { id: findUser.id });
-
+        await User.update({ isAuthenticated: true, otp: null }, { where: { id: findUser.id } },
+            { transaction: t });
+        await t.commit()
         return res.status(200).json({ message: 'Email verified successfully' });
 
     } catch (err) {
         console.log("🚀 ~ login ~ err:", err)
+        await t.rollback()
         throw new Error(err)
     }
 }
@@ -123,5 +147,6 @@ module.exports = {
     logout,
     getSignUpPage,
     signUp,
+    getVerifyOtpPage,
     verify
 }

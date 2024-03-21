@@ -41,12 +41,12 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: '/auth/signUp',
+            url: '/auth/sign-up',
             method: 'POST',
             data: { username, email, password },
             success: function (response) {
-                console.log('Sign-up successful:', response);
-                // Redirect or show success message as needed
+                console.log("🚀 ~ response:", response)
+                window.location.href = `/auth/${response?.id}/verify-otp`;
             },
             error: function (xhr, status, error) {
                 console.error('Sign-up failed:', error);

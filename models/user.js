@@ -24,7 +24,8 @@ const user = sequelize.define('user', {
     },
     isAuthenticated: {
         type: DataTypes.BOOLEAN,
-        default: false
+        allowNull: false,
+        defaultValue: false
     }
 }, {
     tableName: 'users'

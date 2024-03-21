@@ -18,6 +18,10 @@ passport.use(new LocalStrategy({
             return done(null, false, { message: 'Incorrect password.' });
         }
 
+        if (!findUser.isAuthenticated) {
+            return done(null, false, { message: 'User is not authenticated yet!' });
+        }
+
         const payLoad = {
             id: findUser.id,
             userName: findUser.firstName + ' ' + findUser.lastName,

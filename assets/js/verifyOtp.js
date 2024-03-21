@@ -8,11 +8,11 @@ $(document).ready(function () {
         const otp = $('#otp').val();
 
         $.ajax({
-            url: '/verify',
+            url: '/auth/verify',
             method: 'POST',
             data: { email, otp },
             success: function (response) {
-                console.log('Email verification successful:', response);
+                window.location.href = '/auth/login'
             },
             error: function (xhr, status, error) {
                 console.error('Email verification failed:', error);
