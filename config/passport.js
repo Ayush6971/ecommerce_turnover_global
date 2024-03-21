@@ -2,7 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const jwt = require('jsonwebtoken');
 const { validatePassword } = require('../controller/commonController')
-const user = require('../models/user')
+const User = require('../models/user')
 require('dotenv').config({})
 
 passport.use(new LocalStrategy({
@@ -10,7 +10,7 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
 },
     async (email, password, done) => {
-        const findUser = await user.findOne({ where: { email } })
+        const findUser = await User.findOne({ where: { email } })
         if (!findUser) {
             return done(null, false, { message: 'Incorrect email.' });
         }
@@ -24,7 +24,7 @@ passport.use(new LocalStrategy({
 
         const payLoad = {
             id: findUser.id,
-            userName: findUser.firstName + ' ' + findUser.lastName,
+            userName: findUser.username,
             email: findUser.email
         }
         const token = jwt.sign(payLoad, process.env.JWT_SECRET);
@@ -39,7 +39,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const findUser = await user.findOne({ id, include: 'role' })
+        const findUser = await User.findOne({ where: { id } })
         done(null, findUser);
     } catch (error) {
         done(error);

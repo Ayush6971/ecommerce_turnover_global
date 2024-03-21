@@ -6,6 +6,7 @@ const passport = require('passport');
 const session = require('express-session');
 const { sequelize } = require('./models')
 const { seedData } = require('./seeder/seedDB')
+const { getLoginPage } = require('./controller/authController')
 
 require('dotenv').config({})
 
@@ -38,7 +39,6 @@ require("./config/passport");
 //routes
 require("./routes/r-index")(app);
 
-
 // authenticate db connection
 sequelize.authenticate()
     .then(() => {
@@ -49,6 +49,8 @@ sequelize.authenticate()
     });
 
 sequelize.sync({ force: false }).then(() => seedData())
+
+app.use('/', getLoginPage)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

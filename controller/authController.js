@@ -1,12 +1,12 @@
 const passport = require('passport');
-const { sequelize, Sequelize } = require('../models/');
+const { sequelize } = require('../models/');
 const { hashPassword, generateOTP, renderTemplate } = require('./commonController');
 const User = require('../models/user');
 const { sendEmail } = require('../utils/email')
 require('dotenv').config({})
 
 const getLoginPage = async (req, res) => {
-    return res.render('login');
+    return res.render('login', { req });
 }
 
 const login = (req, res, next) => {
@@ -29,7 +29,7 @@ const login = (req, res, next) => {
             };
             res.cookie("jwt", user.token, cookieOptions);
 
-            return res.redirect('/dashboard');
+            return res.status(200).json({ message: 'user logged in successfully' });
         })(req, res, next);
     } catch (err) {
         console.log("🚀 ~ login ~ err:", err)
@@ -37,19 +37,21 @@ const login = (req, res, next) => {
     }
 };
 
-const logout = (req, res) => {
+const logout = (req, res, next) => {
     try {
-        req.logout();
-        res.clearcookie()
+        req.logout((err) => {
+            if (err) { return next(err); }
+        });
+        res.setHeader('Clear-Site-Data', '"cookies"');
         return res.status(200).send({ message: 'Logged out successfully' })
     } catch (error) {
         console.log("🚀 ~ logout ~ err:", error)
-        throw new Error(err)
+        throw new Error(error)
     }
 };
 
 const getSignUpPage = async (req, res) => {
-    return res.render('signUp');
+    return res.render('signUp', { req });
 }
 
 const signUp = async (req, res) => {
@@ -104,7 +106,7 @@ const getVerifyOtpPage = async (req, res) => {
                 message: 'User not found'
             });
         }
-        return res.render('verifyOtp', { email: findUser.email });
+        return res.render('verifyOtp', { email: findUser.email, req });
     } catch (err) {
         console.log("🚀 ~ login ~ err:", err)
         throw new Error(err)

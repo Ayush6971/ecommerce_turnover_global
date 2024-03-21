@@ -38,12 +38,14 @@ $(document).ready(function () {
             data: { email, password },
             success: function (response) {
                 console.log('Login successful:', response);
+                window.location.href = '/userCategories/mark-interests'
             },
             error: function (xhr, status, error) {
                 console.error('Login failed:', error);
                 const errorMessage = xhr.responseJSON.message || 'An error occurred during login';
-                const flashMessage = `<div class="alert alert-danger" id="flash-message">${errorMessage}</div>`;
+                const flashMessage = `<div class="alert alert-danger flash-message">${errorMessage}</div>`;
                 $('#login-form').before(flashMessage);
+                $('.flash-message').delay(2000).fadeOut('slow');
             },
             complete: function () {
                 $('#login-form button[type="submit"]').prop('disabled', false); // Enable submit button after AJAX request completes

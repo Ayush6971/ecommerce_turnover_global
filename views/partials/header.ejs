@@ -1,6 +1,12 @@
-<!-- Header -->
 <header class="header">
     <div class="container">
         <h1>ECOMMERCE</h1>
+        <% if (req.user) { %>
+            <div class="header-right">
+                <button id="logout-button" class="btn btn-outline-primary">
+                    <i class="fa fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            <% } %>
     </div>
 </header>

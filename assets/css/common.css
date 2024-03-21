@@ -1,5 +1,16 @@
 .login-box,
 .signup-box,
-.verifyOtp-box {
+.verifyOtp-box,
+.categories-box {
     width: 400px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-right {
+    margin-left: auto;
 }

@@ -13,7 +13,7 @@ const authorize = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        const requestUser = await user.findOne({ where: { id: decoded.id, isDisabled: false } })
+        const requestUser = await user.findOne({ where: { id: decoded.id } })
         if (!requestUser) {
             return res.status(401).json({ status: 'error', message: 'Unauthorized - Invalid User' });
         }
@@ -23,6 +23,9 @@ const authorize = async (req, res, next) => {
             userName: decoded.userName,
             email: decoded.email,
         };
+
+        res.isLoggedIn = true;
+
 
         next();
     } catch (error) {

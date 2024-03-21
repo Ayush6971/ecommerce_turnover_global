@@ -17,8 +17,9 @@ $(document).ready(function () {
             error: function (xhr, status, error) {
                 console.error('Email verification failed:', error);
                 const errorMessage = xhr.responseJSON.message || 'An error occurred during login';
-                const flashMessage = `<div class="alert alert-danger" id="flash-message">${errorMessage}</div>`;
+                const flashMessage = `<div class="alert alert-danger flash-message">${errorMessage}</div>`;
                 $('#verify-form').before(flashMessage);
+                $('.flash-message').delay(2000).fadeOut('slow');
             },
             complete: function () {
                 $('#verify-button').prop('disabled', false);

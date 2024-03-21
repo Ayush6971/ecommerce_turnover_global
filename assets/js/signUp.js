@@ -51,8 +51,9 @@ $(document).ready(function () {
             error: function (xhr, status, error) {
                 console.error('Sign-up failed:', error);
                 const errorMessage = xhr.responseJSON.message || 'An error occurred during sign-up';
-                const flashMessage = `<div class="alert alert-danger" id="flash-message">${errorMessage}</div>`;
+                const flashMessage = `<div class="alert alert-danger flash-message">${errorMessage}</div>`;
                 $('#signup-form').before(flashMessage);
+                $('.flash-message').delay(2000).fadeOut('slow');
             },
             complete: function () {
                 $('#signup-form button[type="submit"]').prop('disabled', false);
